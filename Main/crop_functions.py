@@ -82,7 +82,8 @@ def tryEnergyManagement():
 
 def mainLoop():
 	global __skipHarvestFlag
-	tryGoPlantCompanion()
+	if not pumpkin.isInPumpkinPatch():
+		tryGoPlantCompanion()
 	if __skipHarvestFlag == False:
 		harvesting.autonomousHarvesting()
 	planting.autonomousPlanting()

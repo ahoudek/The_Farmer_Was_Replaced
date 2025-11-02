@@ -12,6 +12,8 @@ def isHarvestable():
 	elif curCrop == Entities.Pumpkin:
 		if pumpkin.isPumpkinReadyForHarvest():
 			return True
+		else:
+			return False
 	#if crop is sunflower, check if flower has the highest number of petals
 	elif curCrop == Entities.Sunflower:
 		if sunflower.isBestSunflower():

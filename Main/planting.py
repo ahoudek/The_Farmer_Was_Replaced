@@ -81,5 +81,5 @@ def autonomousPlanting():
 	cropSelected = defaultChooseCrop()
 	if performPlant(cropSelected) == False:
 		#prevent empty square of nothing growing
-		if cropSelected == None and get_ground_type() == Grounds.Soil:
+		if cropSelected != None and get_ground_type() == Grounds.Soil: #TODO check this
 			till()
