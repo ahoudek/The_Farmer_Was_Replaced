@@ -73,7 +73,7 @@ def tryGoPlantCompanion():
 				__skipHarvestFlag = True
 
 def tryEnergyManagement():
-	if planting.isEnergyLow():
+	if planting.isEnergyLow() and movement.checkSurroundingTilesForCrop(Entities.Sunflower) == False:
 		bestFlowerIndex = sunflower.getHighestPetalsFlower()
 		if bestFlowerIndex != 0:
 			movement.goToPosition(bestFlowerIndex)

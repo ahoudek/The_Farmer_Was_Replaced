@@ -2,6 +2,14 @@ import global_utilities
 
 rowInvert = False
 
+farm = []
+
+grid = [
+	[Entities.Tree, Entities.Carrot, Entities.Bush],
+	[Entities.Pumpkin, Entities.Tree, Entities.Grass],
+	[Entities.Cactus, Entities.Carrot, Entities.Grass]
+]
+
 def continueToNext():
 	global rowInvert
 	#start over if at end of grid

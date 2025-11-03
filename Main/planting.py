@@ -8,7 +8,7 @@ __cropsPreferredGround = {Entities.Grass:Grounds.Grassland, Entities.Bush:Ground
 
 def isEnergyLow():
 	global_utilities.updateResourceValues()
-	if global_utilities.energyNum < 1: #.1
+	if global_utilities.energyNum < 2:
 		return True
 	return False
 

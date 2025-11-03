@@ -1,5 +1,5 @@
-defaultWaterLvl = 0.01
-pumpkinWaterLvl = 0.1
+defaultWaterLvl = 0.1
+pumpkinWaterLvl = 0.0
 flowerWaterLvl = 0.55
 
 def useSupplements():
