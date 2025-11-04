@@ -2,36 +2,25 @@ import global_utilities
 import supplements
 import pumpkin
 import sunflower
-import movement
 
 __cropsPreferredGround = {Entities.Grass:Grounds.Grassland, Entities.Bush:Grounds.Grassland, Entities.Tree:Grounds.Grassland, Entities.Carrot:Grounds.Soil, Entities.Cactus:Grounds.Soil, Entities.Sunflower:Grounds.Soil, Entities.Pumpkin:Grounds.Soil}
 
-def isEnergyLow():
-	global_utilities.updateResourceValues()
-	if global_utilities.energyNum < 2:
-		return True
-	return False
-
-def isPlantable(crop):
-	plantType = get_entity_type()
+def isPlantable(crop, loc = (get_pos_x(),get_pos_y())):
 	if crop != None:
+		x,y = loc
+		alreadyPlanted = global_utilities.farm[x][y]
 		#check if it's trying to plant something that isn't a pumpkin in the pumpkin patch
-		if crop != Entities.Pumpkin and pumpkin.isInPumpkinPatch():
-			return False
-		#check if there is already something planted there besides grass
-		if plantType != Entities.Grass and plantType != None and plantType != Entities.Dead_Pumpkin:
-			return False
-		#if crop == Entities.Sunflower and not sunflower.okToPlantSunflower():
-		#	return False
-		#don't plant a tree next to another tree
-		if crop == Entities.Tree and movement.checkSurroundingTilesForCrop(crop):
+		if crop != Entities.Pumpkin and global_utilities.fullPassCt % global_utilities.plantPumpkinsEvery == 0 and global_utilities.fullPassCt > 0 and crop != Entities.Sunflower:
 			return False
 		#harvest any grown crop if it's there instead of wasting it by planting over, except for special harvest cases
-		if plantType != Entities.Pumpkin and plantType != Entities.Sunflower: #plantType == Entities.Grass:
+		if alreadyPlanted != None and alreadyPlanted != Entities.Pumpkin:
 			if can_harvest():
 				harvest()
+		#don't plant a tree next to another tree
+		if crop == Entities.Tree and global_utilities.isPositionSurroundedByCrop(crop, loc):
+			return False
 		#check if the ground needs to be tilled. if so, till it
-		if __cropsPreferredGround[crop] != get_ground_type():
+		if __cropsPreferredGround[crop] != global_utilities.getGroundTypeAtPosition(loc):
 			till()
 		return True
 	return False
@@ -54,32 +43,32 @@ def performPlant(crop):
 	return False
 
 def defaultChooseCrop():
-	#replace dead pumpkins
-	if get_entity_type() == Entities.Dead_Pumpkin:
+	currentlyPlanted = get_entity_type()
+	#always replace dead pumpkins
+	if currentlyPlanted == Entities.Dead_Pumpkin:
 		return Entities.Pumpkin
-	
 	#determine what to plant based on current resources and previous crop	
 	global_utilities.updateResourceValues()
-	if get_entity_type() == None or get_entity_type() == Entities.Grass:
-		if pumpkin.isInPumpkinPatch():
-			return Entities.Pumpkin
-		elif isEnergyLow() and sunflower.getNumOfPlantedFlowers() <= 10: #and (get_pos_x() % 2 == 0 or get_pos_y() % 2 == 0): #TODO spread out flowers
-			return Entities.Sunflower
-		elif get_entity_type() == Entities.Tree or get_pos_x() == get_pos_y() or get_pos_x() + get_pos_y() == get_world_size() - 1:
-			return Entities.Tree
-		elif global_utilities.hayNum <= global_utilities.resourceValueFloor: #or global_utilities.hayNum < global_utilities.carrotNum:
-			return Entities.Grass
-		elif global_utilities.carrotNum <= global_utilities.resourceValueFloor:
-			return Entities.Carrot
-		elif global_utilities.mostInDemandCrop != None:
-			return global_utilities.mostInDemandCrop
-		else:
-			return Entities.Grass
-	return None
+	if global_utilities.fullPassCt % global_utilities.plantPumpkinsEvery == 0 and global_utilities.fullPassCt > 0:
+		return Entities.Pumpkin
+	elif global_utilities.powerNum <= global_utilities.criticalPowerLevel * 5 or sunflower.sfFloorForPlanting > sunflower.getNumOfPlantedFlowers():
+		return Entities.Sunflower
+	elif currentlyPlanted == Entities.Tree or get_pos_x() == get_pos_y() or get_pos_x() + get_pos_y() == get_world_size() - 1:
+		return Entities.Tree
+	elif global_utilities.hayNum <= global_utilities.resourceValueFloor:
+		return Entities.Grass
+	elif global_utilities.carrotNum <= global_utilities.resourceValueFloor:
+		return Entities.Carrot
+	elif global_utilities.mostInDemandCrop != None:
+		return global_utilities.mostInDemandCrop
+	else:
+		return Entities.Grass
 
 def autonomousPlanting():
 	cropSelected = defaultChooseCrop()
-	if performPlant(cropSelected) == False:
-		#prevent empty square of nothing growing
-		if cropSelected != None and get_ground_type() == Grounds.Soil: #TODO check this
-			till()
+	if cropSelected != None and performPlant(cropSelected) == False:
+		#try again with another crop
+		if performPlant(global_utilities.mostInDemandCrop) == False:
+			#prevent empty square of nothing growing
+			if cropSelected != None and get_ground_type() == Grounds.Soil:
+				till()

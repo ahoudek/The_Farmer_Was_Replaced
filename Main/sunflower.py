@@ -1,6 +1,6 @@
-#plantedSfCt = 0
 sfHighPetalCount = 0
 sfHighPetalCountLoc = None
+sfFloorForPlanting = 10
 plantedSunflowers = {}
 
 def getNumOfPlantedFlowers():
@@ -24,27 +24,6 @@ def isBestSunflower():
 		return True
 	return False
 
-#def prepForPlantingSunflower():
-	#plantedSunflowers[(get_pos_x(), get_pos_y())] = measure()
-	#checkPetals(highestNumPetals)
-
-def okToPlantSunflower():
-	if get_pos_x() % 2 == 0: #and get_pos_x() % (get_world_size() / 2) == 0:
-		return True
-	return False
-
-def checkPetals(highestNumPetals):
-	if highestNumPetals == None:
-		print('Error')
-		return None
-	if measure() == None:
-		print('Failed to Measure')
-		return None
-	if highestNumPetals < measure():
-		return (get_pos_x(), get_pos_y())
-	else:
-		return None
-
 def getHighestPetalsFlower():
 	highestIndex = 0
 	highestCt = 0
@@ -56,15 +35,3 @@ def getHighestPetalsFlower():
 					highestCt = plantedSunflowers[i]
 					highestIndex = i
 	return highestIndex
-
-def harvestBestSunflower(): #TODO
-	flowerPos = getHighestPetalsFlower()
-	if flowerPos != None:
-		#goToPosition(flowerPos)
-		#harvestCrop()
-		#replant
-		#TODO can remove this once the planting function is better
-		#sunflower.preparePlantSunflower()
-		#planting.plantCropHere(Entities.Sunflower, True)
-		return True
-	return False	

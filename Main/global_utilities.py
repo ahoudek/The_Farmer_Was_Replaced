@@ -1,18 +1,68 @@
+#constants
+mapSize = get_world_size()
+resourceValueFloor = 10000000
+criticalPowerLevel = get_world_size()
+plantPumpkinsEvery = 3
+mostInDemandCrop = Entities.Carrot
+directions = [North,South,East,West]
+
 #navigation/movement
 currentTileCount = 0
 fullPassCt = 0
-directions = [North,South,East,West]
 
 #available resource values
 hayNum = num_items(Items.Hay)
 woodNum = num_items(Items.Wood)
 carrotNum = num_items(Items.Carrot)
 pumpkinNum = num_items(Items.Pumpkin)
-energyNum = num_items(Items.Power)
+powerNum = num_items(Items.Power)
 
-#constants
-resourceValueFloor = 10000000
-mostInDemandCrop = Entities.Carrot
+#farm/map grid
+farm = []
+i = 0
+while i < mapSize:
+	row = []
+	j = 0
+	while j < mapSize:
+		tile = []
+		x = 0
+		while x < 3:
+			tile.append(None)
+			x += 1
+		row.append(tile)
+		j += 1
+	farm.append(row)
+	i += 1
+
+def updateFarmGridWithCurrentPosition():
+	global farm
+	x = get_pos_x()
+	y = get_pos_y()
+	farm[x][y] = [get_entity_type(),get_ground_type(),measure()]
+	#quick_print(str((x,y)) + ': ' + str(farm[x][y]))
+
+def getCropTypeAtPosition(position = (get_pos_x(), get_pos_y())):
+	global farm
+	x, y = position
+	return farm[x][y][0]
+
+def getGroundTypeAtPosition(position = (get_pos_x(), get_pos_y())):
+	global farm
+	x, y = position
+	return farm[x][y][1]
+
+def isPositionSurroundedByCrop(cropType, position):
+	global farm
+	x,y = position
+	if x < mapSize - 1 and farm[x+1][y][0] == cropType:
+		return True
+	if x > 0 and farm[x-1][y][0] == cropType:
+		return True
+	if y < mapSize - 1 and farm[x][y+1][0] == cropType:
+		return True
+	if y > 0 and  farm[x][y-1][0] == cropType:
+		return True
+	return False
 
 def getTileCount():
 	global currentTileCount
@@ -33,24 +83,27 @@ def getFullPassCount():
 def incrementFullPassCount():
 	global fullPassCt
 	fullPassCt += 1
+	print(fullPassCt)
 
 def resetFullPassCount():
 	global fullPassCt
 	fullPassCt = 0
+	print(fullPassCt)
 
 def updateResourceValues():
 	global hayNum
 	global woodNum
 	global carrotNum
 	global pumpkinNum
-	global energyNum
+	global powerNum
 	global resourceValueFloor
+	global criticalPowerLevel
 
 	hayNum = num_items(Items.Hay)
 	woodNum = num_items(Items.Wood)
 	carrotNum = num_items(Items.Carrot)
 	pumpkinNum = num_items(Items.Pumpkin)
-	energyNum = num_items(Items.Power)
+	powerNum = num_items(Items.Power)
 
 	#update resource floor dynamically based on lowest quantity resource
 	resources = [hayNum, woodNum, carrotNum, pumpkinNum]

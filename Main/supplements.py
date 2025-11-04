@@ -1,12 +1,8 @@
-defaultWaterLvl = 0.1
+defaultWaterLvl = 0.0
 pumpkinWaterLvl = 0.0
-flowerWaterLvl = 0.55
+flowerWaterLvl = 0.6
 
 def useSupplements():
-	useWater()
-	#useFertilizer()
-
-def useWater():
 	global defaultWaterLvl
 	global pumpkinWaterLvl
 	global flowerWaterLvl
