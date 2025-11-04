@@ -6,7 +6,6 @@ import movement
 import sunflower
 import pumpkin
 
-__skipHarvestFlag = False
 __distantCropsToPlant = []
 
 def tryHarvestCrop():
@@ -73,7 +72,6 @@ def tryGoPlantCompanion():
 				__distantCropsToPlant.append((pos, type))
 				goNext = True
 	#if invalid location or if planting failed, move on
-	#return goNext
 	if originalLoc != ((get_pos_x(), get_pos_y())):
 		movement.goToPosition(originalLoc)
 
@@ -82,7 +80,8 @@ def findSunflowerIfPowerCritical():
 	global_utilities.updateResourceValues()
 	if global_utilities.powerNum < global_utilities.criticalPowerLevel:
 		#harvest until level is higher than minimum so we don't keep coming back to this as it barely rises and barely drops below threshold
-		while global_utilities.powerNum <= global_utilities.criticalPowerLevel * 2: #and sunflower.getNumOfPlantedFlowers() > sunflower.sfFloorForPlanting:
+		#must also check if sunflowers are actually planted before trying to find and harvest them
+		while global_utilities.powerNum <= global_utilities.criticalPowerLevel * 2 and sunflower.getNumOfPlantedFlowers() > sunflower.sfFloorForPlanting:
 			bestFlowerIndex = sunflower.getHighestPetalsFlower()
 			if bestFlowerIndex != 0:
 				movement.goToPosition(bestFlowerIndex)
@@ -102,7 +101,6 @@ def autoCropProcess():
 def mainLoop():
 	#if energy is critical and there are enough sunflowers planted, harvest the best one(s) to raise power level
 	#if at a different position than original, return to original position after
-	#TODO is stuck on power level when there's less than 10 flowers planted
 	findSunflowerIfPowerCritical()
 
 	#if the current position plant wants a companion, go plant it if possible, then come back to this location to harvest and re-plant

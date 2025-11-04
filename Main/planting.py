@@ -19,15 +19,15 @@ def isPlantable(crop, loc = (get_pos_x(),get_pos_y())):
 		#don't plant a tree next to another tree
 		if crop == Entities.Tree and global_utilities.isPositionSurroundedByCrop(crop, loc):
 			return False
-		#check if the ground needs to be tilled. if so, till it
-		if __cropsPreferredGround[crop] != global_utilities.getGroundTypeAtPosition(loc):
-			till()
 		return True
 	return False
 
 def performPlant(crop):
 	if crop != None:
 		if isPlantable(crop):
+			#check if the ground needs to be tilled. if so, till it
+			if __cropsPreferredGround[crop] != get_ground_type():
+				till()
 			if crop == Entities.Sunflower:
 				#sunflower planting process
 				plant(crop)
@@ -49,7 +49,8 @@ def defaultChooseCrop():
 		return Entities.Pumpkin
 	#determine what to plant based on current resources and previous crop	
 	global_utilities.updateResourceValues()
-	if global_utilities.fullPassCt % global_utilities.plantPumpkinsEvery == 0 and global_utilities.fullPassCt > 0:
+	#plant pumpkins if on a pumpkin lap OR if we haven't harvested the pumpkin yet (majority of grid is pumpkins)
+	if global_utilities.howManyOfCropPlanted(Entities.Pumpkin) > global_utilities.getMaxTileCount() / 2 or (global_utilities.fullPassCt % global_utilities.plantPumpkinsEvery == 0 and global_utilities.fullPassCt > 0):
 		return Entities.Pumpkin
 	elif global_utilities.powerNum <= global_utilities.criticalPowerLevel * 5 or sunflower.sfFloorForPlanting > sunflower.getNumOfPlantedFlowers():
 		return Entities.Sunflower
@@ -70,5 +71,6 @@ def autonomousPlanting():
 		#try again with another crop
 		if performPlant(global_utilities.mostInDemandCrop) == False:
 			#prevent empty square of nothing growing
-			if cropSelected != None and get_ground_type() == Grounds.Soil:
-				till()
+			#if cropSelected != None and get_ground_type() == Grounds.Soil:
+			#	till()
+			return

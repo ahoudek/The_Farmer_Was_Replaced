@@ -1,8 +1,8 @@
 #constants
 mapSize = get_world_size()
 resourceValueFloor = 10000000
-criticalPowerLevel = get_world_size()
-plantPumpkinsEvery = 3
+criticalPowerLevel = mapSize
+plantPumpkinsEvery = 2
 mostInDemandCrop = Entities.Carrot
 directions = [North,South,East,West]
 
@@ -64,6 +64,14 @@ def isPositionSurroundedByCrop(cropType, position):
 		return True
 	return False
 
+def howManyOfCropPlanted(cropType):
+	global farm
+	count = 0
+	for i in farm:
+		if i[0] == cropType:
+			count += 1
+	return count
+
 def getTileCount():
 	global currentTileCount
 	return currentTileCount
@@ -75,6 +83,9 @@ def incrementTileCount():
 def resetTileCount():
 	global currentTileCount
 	currentTileCount = 0
+
+def getMaxTileCount():
+	return mapSize * mapSize
 
 def getFullPassCount():
 	global fullPassCt
