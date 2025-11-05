@@ -4,7 +4,6 @@ import planting
 import harvesting
 import movement
 import sunflower
-import pumpkin
 
 __distantCropsToPlant = []
 
@@ -46,6 +45,10 @@ def checkForQueuedPlants():
 	originalLoc = (get_pos_x(), get_pos_y())
 	for i in __distantCropsToPlant:
 		plannedPlanting = i
+		if plannedPlanting[0] == originalLoc:
+			#skip if it wants to plant at the original location since that will be likely harvested immediately
+			__distantCropsToPlant.remove(plannedPlanting)
+			continue
 		if isDistanceTooFar(plannedPlanting[0]) == False:
 			plantAtLocation(plannedPlanting[1],plannedPlanting[0])
 			__distantCropsToPlant.remove(plannedPlanting)
@@ -54,28 +57,43 @@ def checkForQueuedPlants():
 		movement.goToPosition(originalLoc)
 	
 def tryGoPlantCompanion():
-	goNext = False
+	#if we're planting pumpkins, we don't want to plant anything else
+	if planting.plantingPumpkins():
+		return True
+	
 	originalLoc = (get_pos_x(), get_pos_y())
 	checkForQueuedPlants()
+
 	#if companion exists, check if position is valid for the crop it wants
-	while goNext == False and get_companion() != None:
+	if get_companion() != None:
 		type, pos = get_companion()
-		if planting.isPlantable(type, pos):
+		if global_utilities.getCropTypeAtPosition(pos) == type:
+			#this type of crop is already planted at that location = ok to harvest original
+			return True
+		elif planting.isPlantable(type, pos):
 			#if valid for planting and not too far away, go to it
 			if isDistanceTooFar(pos) == False:
 				#plant companion if possible
-				goNext = plantAtLocation(type, pos)
-				#check for others in queue nearby and plant them while there if possible
-				checkForQueuedPlants()
+				plantAtLocation(type, pos)
+				#if invalid location or if planting failed, move on
+				if originalLoc != ((get_pos_x(), get_pos_y())):
+					movement.goToPosition(originalLoc)
+				return True
 			else:
 				#if valid but too far away, add to queue and move on
 				__distantCropsToPlant.append((pos, type))
-				goNext = True
-	#if invalid location or if planting failed, move on
-	if originalLoc != ((get_pos_x(), get_pos_y())):
-		movement.goToPosition(originalLoc)
-
+				return False
+		else:
+			return True
+	else:
+		#no companion wanted = okay to harvest original
+		return True
+		
 def findSunflowerIfPowerCritical():
+	#if we're planting pumpkins, we don't want to plant anything else
+	if planting.plantingPumpkins():
+		return
+	
 	originalLoc = (get_pos_x(), get_pos_y())
 	global_utilities.updateResourceValues()
 	if global_utilities.powerNum < global_utilities.criticalPowerLevel:
@@ -91,11 +109,7 @@ def findSunflowerIfPowerCritical():
 			movement.goToPosition(originalLoc)
 
 def autoCropProcess():
-	#harvest current tile if possible (call needed because of pumpkins, sunflowers,
-	#which are not included in plant method's harvesting when plant is detected)
 	harvesting.autonomousHarvesting()
-
-	#plant best crop for this position in the current tile, if possible
 	planting.autonomousPlanting()
 
 def mainLoop():
@@ -106,10 +120,12 @@ def mainLoop():
 	#if the current position plant wants a companion, go plant it if possible, then come back to this location to harvest and re-plant
 	#if too far away, add to queue for when drone is close to position next
 	#continues until planted crop does not have a companion or planting the companion at its desired location is invalid or too far away
-	tryGoPlantCompanion()
-
-	#the harvest/plant process
-	autoCropProcess()
+	if tryGoPlantCompanion():
+		#the harvest/plant process
+		#harvest current tile if possible (call needed because of pumpkins, sunflowers,
+		#which are not included in plant method's harvesting when plant is detected)
+		#plant best crop for this position in the current tile, if possible
+		autoCropProcess()
 
 	#continue to next tile
 	movement.moveNextAsSnakePattern()

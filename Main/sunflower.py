@@ -1,3 +1,5 @@
+import global_utilities
+
 sfHighPetalCount = 0
 sfHighPetalCountLoc = None
 sfFloorForPlanting = 10
@@ -18,6 +20,12 @@ def getNumOfPlantedFlowers():
 	#    sfHighPetalCountLoc = newHighPetalCtLoc
 	#    sfHighPetalCount = measure()
 
+def canPlant():
+	return
+
+def canHarvest():
+	return
+
 def isBestSunflower():
 	flower = getHighestPetalsFlower()
 	if flower == (get_pos_x(), get_pos_y()):
@@ -35,3 +43,10 @@ def getHighestPetalsFlower():
 					highestCt = plantedSunflowers[i]
 					highestIndex = i
 	return highestIndex
+
+def isHarvested():
+	if global_utilities.fullPassCt % global_utilities.plantSunflowersEvery == 0: #and global_utilities.fullPassCt > 0:
+		return False
+	elif global_utilities.howManyOfCropPlanted(Entities.Sunflower) > global_utilities.getMaxTileCount() / 4:
+		return False
+	return True

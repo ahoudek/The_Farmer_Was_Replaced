@@ -2,7 +2,8 @@
 mapSize = get_world_size()
 resourceValueFloor = 10000000
 criticalPowerLevel = mapSize
-plantPumpkinsEvery = 2
+plantPumpkinsEvery = 4
+plantPumpkinsEvery = 3
 mostInDemandCrop = Entities.Carrot
 directions = [North,South,East,West]
 
@@ -33,6 +34,10 @@ while i < mapSize:
 		j += 1
 	farm.append(row)
 	i += 1
+
+def init():
+	if fullPassCt == 0 and get_pos_x() == 0 and get_pos_y() == 0:
+		updateFarmGridWithCurrentPosition()
 
 def updateFarmGridWithCurrentPosition():
 	global farm
@@ -68,8 +73,9 @@ def howManyOfCropPlanted(cropType):
 	global farm
 	count = 0
 	for i in farm:
-		if i[0] == cropType:
-			count += 1
+		for x in i:
+			if x[0] == cropType:
+				count += 1
 	return count
 
 def getTileCount():
@@ -94,11 +100,6 @@ def getFullPassCount():
 def incrementFullPassCount():
 	global fullPassCt
 	fullPassCt += 1
-	print(fullPassCt)
-
-def resetFullPassCount():
-	global fullPassCt
-	fullPassCt = 0
 	print(fullPassCt)
 
 def updateResourceValues():

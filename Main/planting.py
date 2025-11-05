@@ -5,20 +5,34 @@ import sunflower
 
 __cropsPreferredGround = {Entities.Grass:Grounds.Grassland, Entities.Bush:Grounds.Grassland, Entities.Tree:Grounds.Grassland, Entities.Carrot:Grounds.Soil, Entities.Cactus:Grounds.Soil, Entities.Sunflower:Grounds.Soil, Entities.Pumpkin:Grounds.Soil}
 
+#pumpkins planted solo
+def plantingPumpkins():
+	if pumpkin.isPumpkinHarvested():
+		return False
+	return True
+
+#sunflowers planted solo
+def plantingSunflowers():
+	if sunflower.isHarvested():
+		return False
+	return True
+
 def isPlantable(crop, loc = (get_pos_x(),get_pos_y())):
 	if crop != None:
-		x,y = loc
-		alreadyPlanted = global_utilities.farm[x][y]
+		alreadyPlanted = global_utilities.getCropTypeAtPosition(loc)
 		#check if it's trying to plant something that isn't a pumpkin in the pumpkin patch
-		if crop != Entities.Pumpkin and global_utilities.fullPassCt % global_utilities.plantPumpkinsEvery == 0 and global_utilities.fullPassCt > 0 and crop != Entities.Sunflower:
+		if crop != Entities.Pumpkin and plantingPumpkins():
+			return False
+		#don't plant if pumpkin but can't be planted here right now
+		elif crop == Entities.Pumpkin and not pumpkin.canPlant():
+			return False
+		#don't plant a tree next to another tree
+		elif crop == Entities.Tree and global_utilities.isPositionSurroundedByCrop(crop, loc):
 			return False
 		#harvest any grown crop if it's there instead of wasting it by planting over, except for special harvest cases
 		if alreadyPlanted != None and alreadyPlanted != Entities.Pumpkin:
 			if can_harvest():
 				harvest()
-		#don't plant a tree next to another tree
-		if crop == Entities.Tree and global_utilities.isPositionSurroundedByCrop(crop, loc):
-			return False
 		return True
 	return False
 
@@ -47,12 +61,12 @@ def defaultChooseCrop():
 	#always replace dead pumpkins
 	if currentlyPlanted == Entities.Dead_Pumpkin:
 		return Entities.Pumpkin
+	#plant pumpkins if on a pumpkin lap OR if we haven't harvested the pumpkin yet (majority of grid is pumpkins)
+	if not pumpkin.isPumpkinHarvested():
+		return Entities.Pumpkin
 	#determine what to plant based on current resources and previous crop	
 	global_utilities.updateResourceValues()
-	#plant pumpkins if on a pumpkin lap OR if we haven't harvested the pumpkin yet (majority of grid is pumpkins)
-	if global_utilities.howManyOfCropPlanted(Entities.Pumpkin) > global_utilities.getMaxTileCount() / 2 or (global_utilities.fullPassCt % global_utilities.plantPumpkinsEvery == 0 and global_utilities.fullPassCt > 0):
-		return Entities.Pumpkin
-	elif global_utilities.powerNum <= global_utilities.criticalPowerLevel * 5 or sunflower.sfFloorForPlanting > sunflower.getNumOfPlantedFlowers():
+	if global_utilities.powerNum <= global_utilities.criticalPowerLevel * 5 or sunflower.sfFloorForPlanting > sunflower.getNumOfPlantedFlowers():
 		return Entities.Sunflower
 	elif currentlyPlanted == Entities.Tree or get_pos_x() == get_pos_y() or get_pos_x() + get_pos_y() == get_world_size() - 1:
 		return Entities.Tree
@@ -67,10 +81,11 @@ def defaultChooseCrop():
 
 def autonomousPlanting():
 	cropSelected = defaultChooseCrop()
-	if cropSelected != None and performPlant(cropSelected) == False:
+	if cropSelected == None:
+		return
+	performPlant(cropSelected)
 		#try again with another crop
-		if performPlant(global_utilities.mostInDemandCrop) == False:
+		#if performPlant(global_utilities.mostInDemandCrop) == False:
 			#prevent empty square of nothing growing
 			#if cropSelected != None and get_ground_type() == Grounds.Soil:
 			#	till()
-			return

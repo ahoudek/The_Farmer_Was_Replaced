@@ -1,4 +1,4 @@
-defaultWaterLvl = 0.0
+defaultWaterLvl = 0.2
 pumpkinWaterLvl = 0.0
 flowerWaterLvl = 0.6
 
@@ -8,17 +8,25 @@ def useSupplements():
 	global flowerWaterLvl
 	lvl = 0
 	
-	if get_entity_type() == Entities.Pumpkin:
+	crop = get_entity_type()
+	if crop == Entities.Pumpkin:
 		lvl = pumpkinWaterLvl
-	elif get_entity_type() == Entities.Sunflower:
+	elif crop == Entities.Sunflower:
+		use_item(Items.Fertilizer)
+		lvl = flowerWaterLvl
+	elif crop == Entities.Tree:
 		useFertilizer()
+		lvl = flowerWaterLvl
+	elif crop == Entities.Bush:
+		use_item(Items.Fertilizer)
 		lvl = flowerWaterLvl
 	else:
 		lvl = defaultWaterLvl
 		
-	while get_water() < lvl:
-		use_item(Items.Water)
+	if crop != Entities.Pumpkin:
+		while get_water() < lvl:
+			use_item(Items.Water)
 		
 def useFertilizer():
 	use_item(Items.Fertilizer)
-	#use_item(Items.Weird_Substance)
+	use_item(Items.Weird_Substance)

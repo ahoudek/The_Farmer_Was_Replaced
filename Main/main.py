@@ -1,7 +1,7 @@
 import crop_functions
 
 #init
-#clear()
+clear()
 change_hat(Hats.Carrot_Hat)
 #movement.goToPosition((0,0))
 
