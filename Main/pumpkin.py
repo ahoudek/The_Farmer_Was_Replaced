@@ -1,6 +1,6 @@
 import global_utilities
 
-lastHarvestOnLap = -1
+lastHarvestOnLap = 0
 
 def canPlant():
 	global lastHarvestOnLap
@@ -13,13 +13,16 @@ def canPlant():
 	return False
 
 def canHarvest():
-	#Check if any two tiles on opposite sides of the map have the same ID
-	for i in global_utilities.farm[0]:
-		for j in global_utilities.farm[global_utilities.mapSize - 1]:
-			quick_print(str(i[2]) + ', ' + str(j[2]))
-			if i[2] != None and i[2] == j[2]: #and j[2] != None
-				quick_print('*** ' + str(i[2]) + ', ' + str(j[2]))
-				return True
+	x = get_pos_x()
+	#only call if we're on the top or bottom col to prevent looping every single tile
+	if x == 0 or x == global_utilities.mapSize - 1:
+		#Check if any two tiles on opposite sides of the map have the same ID
+		for i in global_utilities.farm[0]:
+			for j in global_utilities.farm[global_utilities.mapSize - 1]:
+				#quick_print(str(i[2]) + ', ' + str(j[2]))
+				if i[2] != None and i[2] == j[2]: #and j[2] != None
+					#quick_print('*** ' + str(i[2]) + ', ' + str(j[2]))
+					return True
 	return False
 
 def isPumpkinHarvested():

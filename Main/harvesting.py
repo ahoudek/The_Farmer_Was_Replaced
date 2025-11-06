@@ -30,12 +30,14 @@ def performHarvest():
 			if curLoc in sunflower.plantedSunflowers:
 				sunflower.plantedSunflowers.pop(curLoc)
 				return harvest()
-			elif curCrop == Entities.Pumpkin:
+			return False
+		elif curCrop == Entities.Pumpkin:
+			if harvest():
 				pumpkin.harvestedNotify()
-				return harvest()
-			else:
-				return False
-		return harvest()
+				return True
+			return False
+		else:
+			return harvest()
 	else:
 		return False
 
