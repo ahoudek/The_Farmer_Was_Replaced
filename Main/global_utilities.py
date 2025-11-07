@@ -2,8 +2,8 @@
 mapSize = get_world_size()
 resourceValueFloor = 10000000
 criticalPowerLevel = mapSize
-plantPumpkinsEvery = 4
-plantPumpkinsEvery = 3
+plantSunflowersEvery = 4
+plantPumpkinsEvery = 5
 mostInDemandCrop = Entities.Carrot
 directions = [North,South,East,West]
 
@@ -44,7 +44,6 @@ def updateFarmGridWithCurrentPosition():
 	x = get_pos_x()
 	y = get_pos_y()
 	farm[x][y] = [get_entity_type(),get_ground_type(),measure()]
-	#quick_print(str((x,y)) + ': ' + str(farm[x][y]))
 
 def getCropTypeAtPosition(position = (get_pos_x(), get_pos_y())):
 	global farm

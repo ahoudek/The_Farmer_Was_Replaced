@@ -115,7 +115,7 @@ def autoCropProcess():
 def mainLoop():
 	#if energy is critical and there are enough sunflowers planted, harvest the best one(s) to raise power level
 	#if at a different position than original, return to original position after
-	findSunflowerIfPowerCritical()
+	#findSunflowerIfPowerCritical()
 
 	#if the current position plant wants a companion, go plant it if possible, then come back to this location to harvest and re-plant
 	#if too far away, add to queue for when drone is close to position next

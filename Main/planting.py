@@ -44,10 +44,11 @@ def performPlant(crop):
 				till()
 			if crop == Entities.Sunflower:
 				#sunflower planting process
-				plant(crop)
-				supplements.useSupplements()
-				sunflower.plantedSunflowers[(get_pos_x(), get_pos_y())] = measure()
-				return True
+				if plant(crop):
+					supplements.useSupplements()
+					sunflower.plantedSunflowers[(get_pos_x(), get_pos_y())] = measure()
+					return True
+				return False
 			else:
 				#general planting process
 				if plant(crop):
@@ -83,9 +84,7 @@ def autonomousPlanting():
 	cropSelected = defaultChooseCrop()
 	if cropSelected == None:
 		return
-	performPlant(cropSelected)
-		#try again with another crop
-		#if performPlant(global_utilities.mostInDemandCrop) == False:
-			#prevent empty square of nothing growing
-			#if cropSelected != None and get_ground_type() == Grounds.Soil:
-			#	till()
+	#plant selected crop
+	if performPlant(cropSelected) == False:
+		#try again with another crop (prevent empty square of nothing growing)
+		performPlant(global_utilities.mostInDemandCrop)

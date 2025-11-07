@@ -32,6 +32,7 @@ def performHarvest():
 				return harvest()
 			return False
 		elif curCrop == Entities.Pumpkin:
+			#special pumpkin harvesting process
 			if harvest():
 				pumpkin.harvestedNotify()
 				return True
